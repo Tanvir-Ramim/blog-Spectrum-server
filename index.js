@@ -44,6 +44,16 @@ async function run() {
            }
        })
 
+       app.get('/recentBlog',async(req,res)=>{
+          try{
+            const result= await blogCollection.find().sort({currentTime:-1}).limit(6) .toArray()
+            res.send(result)
+          }
+          catch{
+            return res.send({error:true, message:error.message})
+          }
+       })
+
 
 
 
