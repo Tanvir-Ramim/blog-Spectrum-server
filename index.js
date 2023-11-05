@@ -1,5 +1,6 @@
 const express=require('express')
 const cors=require('cors')
+const { MongoClient, ServerApiVersion } = require('mongodb');
 require('dotenv').config()
 const app=express()
 const port=process.env.PORT || 5000
@@ -11,7 +12,7 @@ app.use(express.json())
 // assignment11
 // I1JD4pJrdcX3h8oh
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.sikjemj.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -27,8 +28,21 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
-
-
+        const blogCollection=client.db('Blog_Spectrum').collection('All_Blog')
+       
+       app.post('/addBlog',async(req,res)=>{
+           try{
+            const info=req.body
+            const currentTime=new Date()
+            info.currentTime=currentTime
+            const result= await blogCollection.insertOne(info)
+            
+            return res.send(result)
+           }
+           catch{
+               return res.send({error:true, message:error.message})
+           }
+       })
 
 
 
