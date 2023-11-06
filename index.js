@@ -39,6 +39,27 @@ async function run() {
             return res.send({error:true})
           }
        })
+       
+
+       app.get('/allBlog',async(req,res)=>{
+            try
+            {
+                  const data=req.query.value
+                  if(data){
+                    console.log(data)
+                    const query={category: data}
+                    const result=await blogCollection.find(query).toArray()
+                    console.log(result)
+                    return res.send(result)
+                  }
+               
+                 const result= await blogCollection.find().toArray()
+                 return res.send(result)
+            }
+            catch{
+              return res.send({error:true})
+            }
+       })
 
        app.get('/details/:id',async(req,res)=>{
           try{
@@ -69,25 +90,27 @@ async function run() {
     })
 
     app.put('/updateInfo',async(req,res)=>{
-     
-            const info=req.body 
-          console.log(info)
-            const filter={_id : new ObjectId(info.id) }
-            const options = { upsert: true };
-            const {titleNew,categoryNew,shortDescriptionNew,urlNew,longDescriptionNew}=info 
-             const updateInfo={
-                 $set:{
-                  title:titleNew,
-                  category:categoryNew, 
-                  url:urlNew,
-                  longDescription: longDescriptionNew,
-                  shortDescription: shortDescriptionNew
-                 }
-             }
-            const result= await blogCollection.updateOne(filter,updateInfo,options)
-            return res.send(result)
+            try{
+              const info=req.body 
+              const filter={_id : new ObjectId(info.id) }
+              const options = { upsert: true };
+              const {titleNew,categoryNew,shortDescriptionNew,urlNew,longDescriptionNew}=info 
+               const updateInfo={
+                   $set:{
+                    title:titleNew,
+                    category:categoryNew, 
+                    url:urlNew,
+                    longDescription: longDescriptionNew,
+                    shortDescription: shortDescriptionNew
+                   }
+               }
+              const result= await blogCollection.updateOne(filter,updateInfo,options)
+              return res.send(result)
+            }
+            catch{
+              return res.send({error:true})
+            }
         
-       
     })
 
 
