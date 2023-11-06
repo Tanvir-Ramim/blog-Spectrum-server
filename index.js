@@ -40,7 +40,7 @@ async function run() {
             return res.send(result)
            }
            catch{
-               return res.send({error:true, message:error.message})
+               return res.send({error:true})
            }
        })
 
@@ -50,7 +50,7 @@ async function run() {
             return res.send(result)
           }
           catch{
-            return res.send({error:true, message:error.message})
+            return res.send({error:true})
           }
        })
 
@@ -62,7 +62,7 @@ async function run() {
             return res.send(result)
           }
           catch{
-            return res.send({error:true, message:error.message})
+            return res.send({error:true})
           }
 
        })
