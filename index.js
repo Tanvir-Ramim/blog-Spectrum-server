@@ -29,20 +29,6 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
         const blogCollection=client.db('Blog_Spectrum').collection('All_Blog')
-       
-       app.post('/addBlog',async(req,res)=>{
-           try{
-            const info=req.body
-            const currentTime=new Date()
-            info.currentTime=currentTime
-            const result= await blogCollection.insertOne(info)
-            
-            return res.send(result)
-           }
-           catch{
-               return res.send({error:true})
-           }
-       })
 
        app.get('/recentBlog',async(req,res)=>{
           try{
@@ -66,7 +52,43 @@ async function run() {
           }
 
        })
+  
 
+       app.post('/addBlog',async(req,res)=>{
+        try{
+         const info=req.body
+         const currentTime=new Date()
+         info.currentTime=currentTime
+         const result= await blogCollection.insertOne(info)
+         
+         return res.send(result)
+        }
+        catch{
+            return res.send({error:true})
+        }
+    })
+
+    app.put('/updateInfo',async(req,res)=>{
+     
+            const info=req.body 
+          console.log(info)
+            const filter={_id : new ObjectId(info.id) }
+            const options = { upsert: true };
+            const {titleNew,categoryNew,shortDescriptionNew,urlNew,longDescriptionNew}=info 
+             const updateInfo={
+                 $set:{
+                  title:titleNew,
+                  category:categoryNew, 
+                  url:urlNew,
+                  longDescription: longDescriptionNew,
+                  shortDescription: shortDescriptionNew
+                 }
+             }
+            const result= await blogCollection.updateOne(filter,updateInfo,options)
+            return res.send(result)
+        
+       
+    })
 
 
 
