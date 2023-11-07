@@ -52,6 +52,7 @@ async function run() {
         const blog_Spectrum=client.db('Blog_Spectrum')
         const blogCollection=blog_Spectrum.collection('All_Blog')
         const wishListCollection=blog_Spectrum.collection('WishList')
+        const commentSCollection=blog_Spectrum.collection('Comment_Collection')
         
         // jwt
         app.post('/jwt', async(req,res)=>{
@@ -72,6 +73,20 @@ async function run() {
 })
 
             // get
+
+
+            app.get('/comment',async(req,res)=>{
+                 try{
+                  
+                   const searchId=req.query.oldId
+                  const query={oldId: searchId}
+                    const result=await commentSCollection.find(query).toArray()
+                    return res.send(result)
+                 }
+                 catch{
+                  return res.send({error:true})
+                 }
+            })
         
             app.get('/wishList',verify, async (req, res) => {
               if(req.user.email !== req.query.email){
@@ -166,6 +181,21 @@ async function run() {
        
 
         // post api
+         
+        app.post('/comment',async(req,res)=>{
+             try{
+                  const commentInfo=req.body
+                  if(!commentInfo?.comment){
+                    return  res.send({empty:3})
+                  }
+                   const result=await commentSCollection.insertOne(commentInfo)
+                   return res.send(result)
+             }
+             catch{
+              return res.send({error:true})
+             }
+        })
+         
          app.post('/wishlist',async (req,res)=>{
                try{
                 const listInfo=req.body
