@@ -15,9 +15,23 @@ app.use(cors({
     credentials:true
 }))
 app.use(express.json())
-// assignment11
-// I1JD4pJrdcX3h8oh
+app.use(cookieParser())
 
+const verify= async(req,res,next)=>{
+  const token=req?.cookies?.token;
+  if(!token){
+    return res.status(401).send({message: 'Unauthorized access'})
+  }
+   jwt.verify (token,process.env.ACCESS_TOKEN_SECRET,(error,decoded)=>{
+      if(error){
+        return res.status(401).send({message: 'Unauthorized access'})
+      }
+      req.user=decoded
+      next()
+  }
+  )
+
+}
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.sikjemj.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -58,6 +72,22 @@ async function run() {
 })
 
             // get
+        
+            app.get('/wishList',verify, async (req, res) => {
+              if(req.user.email !== req.query.email){
+                   return res.status(401).send({message:'forbidden access'})
+              }
+              let query = {};
+              if (req.query?.email) {
+                console.log(req.query.email)
+                  query = { email: req.query.email }
+              }
+              const result = await wishListCollection.find(query).toArray();
+              res.send(result);
+          })
+
+
+
        app.get('/recentBlog',async(req,res)=>{
           try{
             const result= await blogCollection.find().sort({currentTime:-1}).limit(6) .toArray()
@@ -190,7 +220,18 @@ async function run() {
         
     })
 
-
+  //  delete 
+   app.delete('/deleteWish/:id',async(req,res)=>{
+         try{
+                const id=req.params.id;
+                const query={_id:new ObjectId(id)}
+                const result=await wishListCollection.deleteOne(query)
+                return res.send(result)  
+         }
+         catch{
+          return res.send({error:true})
+         }
+   })
 
 
 
