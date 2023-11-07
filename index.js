@@ -39,17 +39,49 @@ async function run() {
             return res.send({error:true})
           }
        })
-       
+       app.get('/topBlog',async(req,res)=>{
+            try{
+              const result = await blogCollection.aggregate([
+                {
+                  $addFields: {
+                    length: { $strLenCP: "$longDescription" }
+                  }
+                },
+                {
+                  $sort: { length: -1 }
+                },
+                {
+                  $limit: 5
+                }
+              ]).toArray();
+              return res.send(result);
+            }
+            catch{
+              return res.send({error:true})
+            }
+       })
+        app.get('/search',async(req,res)=>{
+             try{
+              const data=req.query.value
+              const query={title: data}
+                    const result=await blogCollection.find(query).toArray()
+                
+                    return res.send(result)
+             }
+             catch{
+               
+             }
+        })
 
        app.get('/allBlog',async(req,res)=>{
             try
             {
                   const data=req.query.value
                   if(data){
-                    console.log(data)
+                   
                     const query={category: data}
                     const result=await blogCollection.find(query).toArray()
-                    console.log(result)
+                
                     return res.send(result)
                   }
                
