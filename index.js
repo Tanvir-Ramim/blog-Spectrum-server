@@ -1,5 +1,7 @@
 const express=require('express')
 const cors=require('cors')
+const jwt=require('jsonwebtoken')
+const cookieParser = require('cookie-parser')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const app=express()
@@ -7,7 +9,11 @@ const port=process.env.PORT || 5000
 
 
 // middleware 
-app.use(cors())
+app.use(cors({
+    //  origin:['http://localhost:5173/'],
+    origin:['http://localhost:5173'],
+    credentials:true
+}))
 app.use(express.json())
 // assignment11
 // I1JD4pJrdcX3h8oh
@@ -28,8 +34,30 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
-        const blogCollection=client.db('Blog_Spectrum').collection('All_Blog')
+    // blogCollection
+        const blog_Spectrum=client.db('Blog_Spectrum')
+        const blogCollection=blog_Spectrum.collection('All_Blog')
+        const wishListCollection=blog_Spectrum.collection('WishList')
+        
+        // jwt
+        app.post('/jwt', async(req,res)=>{
+          const user=req.body 
+          const token=jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'5h'})
+          res
+          .cookie('token',token,{
+             httpOnly: true,
+             secure: true,
+             sameSite:'none'
+          })
+          .send({success: true})
+   })
+   app.post('/jwtRemove',async(req,res)=>{
+    const user=req.body 
+    console.log('logging Out', user)
+    res.clearCookie('token',{maxAge:0}).send({success:true})
+})
 
+            // get
        app.get('/recentBlog',async(req,res)=>{
           try{
             const result= await blogCollection.find().sort({currentTime:-1}).limit(6) .toArray()
@@ -105,7 +133,24 @@ async function run() {
           }
 
        })
-  
+       
+
+        // post api
+         app.post('/wishlist',async (req,res)=>{
+               try{
+                const listInfo=req.body
+               const isExist=await wishListCollection.findOne(listInfo)
+               if(isExist){
+                 return res.send({error:3})
+               }
+               const result=await wishListCollection.insertOne(listInfo)
+               return res.send(result)
+               }
+               catch{
+                return res.send({error:true})
+               }
+         })
+
 
        app.post('/addBlog',async(req,res)=>{
         try{
