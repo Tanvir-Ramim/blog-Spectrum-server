@@ -10,7 +10,7 @@ const port=process.env.PORT || 5000
 
 // middleware 
 app.use(cors({
-    origin:['https://tranquil-faun-0c457c.netlify.app'],
+    origin:['https://capable-meerkat-980aef.netlify.app'],
     credentials:true
 }))
 app.use(express.json())
@@ -61,7 +61,7 @@ async function run() {
           .cookie('token',token,{
              httpOnly: true,
              secure: true,
-            //  sameSite:'none'
+             sameSite:'none'
           })
           .send({success: true})
    })
