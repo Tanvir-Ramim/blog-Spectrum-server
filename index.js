@@ -10,7 +10,7 @@ const port=process.env.PORT || 5000
 
 // middleware 
 app.use(cors({
-    origin:['https://capable-meerkat-980aef.netlify.app'],
+    origin:['http://localhost:5173'],
     credentials:true
 }))
 app.use(express.json())
@@ -93,7 +93,6 @@ async function run() {
               }
               let query = {};
               if (req.query?.email) {
-                console.log(req.query.email)
                   query = { email: req.query.email }
               }
               const result = await wishListCollection.find(query).toArray();
